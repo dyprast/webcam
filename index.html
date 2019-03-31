@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+    <title>WebcamJS Test Page</title>
+    <style>
+        input {
+            margin-top: 10px;
+        }
+        .hide{
+            display: none;
+        }
+        .show{
+            display: block;
+        }
+    </style>
+ 
+</head>
+<body>
+    <p>Ambil Gambar</p>
+    <button onclick="takeImg()" id="takeImg">Tampilkan Kamera</button>
+    <div id="camera" class="hide">Capture</div>
+    
+    <div id="webcam">
+        <input type=button value="Capture" onClick="preview()">
+    </div>
+    <div id="simpan" style="display:none">
+        <input type=button value="Remove" onClick="batal()">
+        <input type=button value="Save" onClick="simpan()" style="font-weight:bold;">
+    </div>
+ 
+    <div id="hasil"></div>
+ 
+    <script src="webcamjs-master/webcam.min.js"></script>
+    <script language="Javascript">
+
+        function takeImg() {
+            var x = document.getElementById("camera");
+            if (x.className === "hide") {
+                Webcam.attach( '#camera' );
+                x.className = "show";
+                var currentBtn = document.getElementById("takeImg");
+                currentBtn.innerHTML = 'Tutup Kamera';
+            }
+            else{
+                x.className = "hide";
+                Webcam.reset( '#camera' );
+                var currentBtn = document.getElementById("takeImg");
+                currentBtn.innerHTML = 'Tampilkan Kamera';
+            }
+        }
+        // konfigursi webcam
+        Webcam.set({
+            width: 320,
+            height: 240,
+            image_format: 'jpg',
+            jpeg_quality: 100
+        });
+ 
+        function preview() {
+            // untuk preview gambar sebelum di upload
+            Webcam.freeze();
+            // ganti display webcam menjadi none dan simpan menjadi terlihat
+            document.getElementById('webcam').style.display = 'none';
+            document.getElementById('simpan').style.display = '';
+        }
+        
+        function batal() {
+            // batal preview
+            Webcam.unfreeze();
+            
+            // ganti display webcam dan simpan seperti semula
+            document.getElementById('webcam').style.display = '';
+            document.getElementById('simpan').style.display = 'none';
+        }
+        
+        function simpan() {
+            // ambil foto
+            Webcam.snap( function(data_uri) {
+                
+                // upload foto
+                Webcam.upload( data_uri, 'upload.php', function(code, text) {} );
+ 
+                // tampilkan hasil gambar yang telah di ambil
+                document.getElementById('hasil').innerHTML = 
+                    '<p>Hasil : </p>' + 
+                    '<img src="'+data_uri+'"/>';
+                
+                Webcam.unfreeze();
+            
+                document.getElementById('webcam').style.display = '';
+                document.getElementById('simpan').style.display = 'none';
+            } );
+        }
+    </script>
+    
+</body>
+</html>
